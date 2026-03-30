@@ -117,6 +117,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Fire-and-forget: send payment confirmation email
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+    fetch(`${siteUrl}/api/email/payment-confirmation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, plan }),
+    }).catch((err) =>
+      console.error('Payment confirmation email trigger failed:', err)
+    );
+
     return NextResponse.json(mockResponse);
   } catch (error) {
     console.error('Payment simulate error:', error);

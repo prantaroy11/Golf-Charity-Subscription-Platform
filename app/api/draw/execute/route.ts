@@ -326,7 +326,43 @@ export async function POST(req: NextRequest) {
         .eq('jackpot_rolled_over', true);
     }
 
-    // ── 14. Return draw results ──
+    // ── 14. Trigger emails on publish ──
+    if (mode === 'publish') {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
+      // Fire-and-forget: send draw results to all participants
+      fetch(`${siteUrl}/api/email/draw-results`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ drawMonth }),
+      }).catch((err) =>
+        console.error('Draw results email trigger failed:', err)
+      );
+
+      // Fire-and-forget: send winner alerts to each winner
+      if (winners.length > 0) {
+        // We need the winner IDs from the DB — fetch them
+        const { data: savedWinners } = await supabaseAdmin
+          .from('winners')
+          .select('id')
+          .eq('draw_id', drawId);
+
+        if (savedWinners) {
+          for (const sw of savedWinners) {
+            fetch(`${siteUrl}/api/email/winner-alert`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ winnerId: sw.id }),
+            }).catch((err) =>
+              console.error('Winner alert email trigger failed:', err)
+            );
+          }
+        }
+      }
+    }
+
+    // ── 15. Return draw results ──
     return NextResponse.json({
       draw: {
         id: drawId,
