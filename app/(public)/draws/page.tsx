@@ -3,13 +3,32 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Trophy, Calendar, ArrowRight, Ticket } from 'lucide-react';
+import {
+  Trophy,
+  Calendar,
+  ArrowRight,
+  Ticket,
+  Users,
+  Sparkles,
+  ArrowUpRight,
+} from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import type { Draw } from '@/types';
 
 // ──────────────────────────────────────────────────────────
-// Draws Index — Public listing of all published draws
+// Draws Archive — Step 13.1
+// Public listing of all published draws with winner counts,
+// jackpot amounts, and links to individual draw pages
 // ──────────────────────────────────────────────────────────
+
+interface EnrichedDraw extends Draw {
+  winner_count: number;
+  prize_pool: {
+    total_pool: number;
+    jackpot_amount: number;
+    jackpot_rolled_over: boolean;
+  } | null;
+}
 
 function formatMonth(drawMonth: string): string {
   const [year, month] = drawMonth.split('-');
@@ -17,8 +36,15 @@ function formatMonth(drawMonth: string): string {
   return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
-export default function DrawsIndexPage() {
-  const [draws, setDraws] = useState<Draw[]>([]);
+function formatPence(pence: number): string {
+  return `£${(pence / 100).toLocaleString('en-GB', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+export default function DrawsArchivePage() {
+  const [draws, setDraws] = useState<EnrichedDraw[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +67,7 @@ export default function DrawsIndexPage() {
   return (
     <>
       {/* ── Dark Hero ── */}
-      <section className="bg-[#1A2E1A] min-h-[40vh] relative overflow-hidden">
+      <section className="bg-[#1A2E1A] min-h-[45vh] relative overflow-hidden">
         {/* Ambient gold glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(212,175,55,0.05)_0%,_transparent_70%)]" />
 
@@ -66,6 +92,48 @@ export default function DrawsIndexPage() {
               Explore past draw results, winning numbers, and prize breakdowns.
               Every draw supports the charities you care about.
             </p>
+
+            {/* Stats summary */}
+            {!loading && draws.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="flex items-center justify-center gap-8 mt-10"
+              >
+                <div className="text-center">
+                  <span className="block text-2xl font-light text-[#D4AF37] tabular-nums">
+                    {draws.length}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-gray-500 font-medium">
+                    Draws
+                  </span>
+                </div>
+                <div className="w-px h-8 bg-white/10" />
+                <div className="text-center">
+                  <span className="block text-2xl font-light text-[#D4AF37] tabular-nums">
+                    {draws.reduce((sum, d) => sum + d.winner_count, 0)}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-gray-500 font-medium">
+                    Winners
+                  </span>
+                </div>
+                <div className="w-px h-8 bg-white/10" />
+                <div className="text-center">
+                  <span className="block text-2xl font-light text-[#D4AF37] tabular-nums">
+                    {formatPence(
+                      draws.reduce(
+                        (sum, d) => sum + (d.prize_pool?.total_pool ?? 0),
+                        0
+                      )
+                    )}
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-gray-500 font-medium">
+                    Total Prizes
+                  </span>
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -82,7 +150,7 @@ export default function DrawsIndexPage() {
                 >
                   <div className="h-6 bg-gray-200 rounded w-2/3 mb-4" />
                   <div className="h-4 bg-gray-100 rounded w-1/2 mb-6" />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mb-6">
                     {[1, 2, 3, 4, 5].map((j) => (
                       <div
                         key={j}
@@ -90,6 +158,7 @@ export default function DrawsIndexPage() {
                       />
                     ))}
                   </div>
+                  <div className="h-4 bg-gray-100 rounded w-1/3" />
                 </div>
               ))}
             </div>
@@ -128,6 +197,7 @@ export default function DrawsIndexPage() {
                     href={`/draws/${draw.draw_month}`}
                     className="group block bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-md transition-all duration-300 hover:border-[#D4AF37]/30"
                   >
+                    {/* Header */}
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-serif text-xl font-medium text-[#1A2E1A]">
                         {formatMonth(draw.draw_month)}
@@ -150,11 +220,50 @@ export default function DrawsIndexPage() {
                       ))}
                     </div>
 
-                    {/* Draw type badge */}
+                    {/* Stats row — Winner count + Jackpot */}
+                    <div className="flex items-center justify-between mb-4 py-3 border-t border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600 font-medium">
+                          {draw.winner_count}{' '}
+                          {draw.winner_count === 1 ? 'winner' : 'winners'}
+                        </span>
+                      </div>
+                      {draw.prize_pool && (
+                        <div className="flex items-center gap-1.5">
+                          <Trophy className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <span className="text-sm font-medium text-[#1A2E1A] tabular-nums">
+                            {formatPence(draw.prize_pool.jackpot_amount)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Jackpot rollover badge */}
+                    {draw.prize_pool?.jackpot_rolled_over && (
+                      <div className="flex items-center gap-1.5 mb-4 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 w-fit">
+                        <ArrowUpRight className="w-3 h-3 text-[#D4AF37]" />
+                        <span className="text-xs text-[#D4AF37] font-medium">
+                          Jackpot rolled over
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Footer */}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">
-                        {draw.draw_type} draw
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs uppercase tracking-widest text-gray-400 font-medium">
+                          {draw.draw_type} draw
+                        </span>
+                        {draw.prize_pool && (
+                          <>
+                            <span className="text-gray-300">·</span>
+                            <span className="text-xs text-gray-400">
+                              Pool: {formatPence(draw.prize_pool.total_pool)}
+                            </span>
+                          </>
+                        )}
+                      </div>
                       <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#D4AF37] transition-colors duration-300" />
                     </div>
                   </Link>

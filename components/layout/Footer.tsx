@@ -11,7 +11,7 @@ const quickLinks = [
   { href: '/', label: 'Home' },
   { href: '/charities', label: 'Charities' },
   { href: '/draws', label: 'Draw Results' },
-  { href: '/#how-it-works', label: 'How It Works' },
+  { href: '/how-it-works', label: 'How It Works' },
   { href: '/subscribe', label: 'Subscribe' },
 ];
 

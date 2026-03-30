@@ -40,7 +40,7 @@ interface NavbarProps {
 const darkNavLinks = [
   { href: '/charities', label: 'Charities' },
   { href: '/draws', label: 'Draws' },
-  { href: '/#how-it-works', label: 'How It Works' },
+  { href: '/how-it-works', label: 'How It Works' },
 ];
 
 const lightNavLinks = [
