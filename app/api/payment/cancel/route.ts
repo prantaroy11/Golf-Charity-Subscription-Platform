@@ -7,18 +7,19 @@ import { createClient } from '@/lib/supabase/server';
 // Updates subscription status to 'cancelled'
 // ──────────────────────────────────────────────────────────
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const supabase = await createClient();
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (!session?.user) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Update subscription status to cancelled
     const { error: dbError } = await supabaseAdmin

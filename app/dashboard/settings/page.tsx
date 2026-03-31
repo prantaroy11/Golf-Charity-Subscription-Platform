@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Settings,
   User,
@@ -68,13 +68,13 @@ function FeedbackAlert({
 }
 
 export default function SettingsPage() {
-  const { user, profile } = useUser();
-  const { subscription, isActive } = useSubscription();
+  const { user, profile, loading: userLoading } = useUser();
+  const { subscription } = useSubscription(user, userLoading);
 
   // Form states
   const [fullName, setFullName] = useState(profile?.full_name ?? '');
   const [email, setEmail] = useState(profile?.email ?? '');
-  const [currentPassword, setCurrentPassword] = useState('');
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -184,7 +184,6 @@ export default function SettingsPage() {
       );
     } else {
       showFeedback('password', 'success', 'Password updated successfully.');
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     }

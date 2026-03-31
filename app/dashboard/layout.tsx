@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import {
   LayoutDashboard,
   Target,
-  Ticket,
   Heart,
   Trophy,
   Settings,
@@ -45,22 +45,24 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { user, profile, loading: userLoading, isAdmin } = useUser();
-  const { isActive, loading: subLoading } = useSubscription();
+  const { isActive, loading: subLoading } = useSubscription(user, userLoading);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Auth guard
+  // Auth guard — redirect to login if not authenticated
+  // Proxy also handles this, but this is a client-side fallback
   useEffect(() => {
     if (!userLoading && !user) {
-      router.push('/login');
+      router.push('/login?redirect=/dashboard');
     }
   }, [user, userLoading, router]);
 
-  // Subscription guard
+  // Subscription guard — redirect non-admin users without active sub
+  // Admins bypass this check so they can always access the dashboard
   useEffect(() => {
-    if (!userLoading && !subLoading && user && !isActive) {
+    if (!userLoading && !subLoading && user && !isActive && !isAdmin) {
       router.push('/subscribe');
     }
-  }, [user, userLoading, subLoading, isActive, router]);
+  }, [user, userLoading, subLoading, isActive, isAdmin, router]);
 
   // Prevent body scroll when mobile sidebar is open
   useEffect(() => {
@@ -93,7 +95,8 @@ export default function DashboardLayout({
   }
 
   // Don't render anything until auth check is done
-  if (!user || !isActive) return null;
+  // Admins bypass subscription check
+  if (!user || (!isActive && !isAdmin)) return null;
 
   const initials = profile?.full_name
     ? profile.full_name
@@ -291,7 +294,7 @@ export default function DashboardLayout({
       {/* ── Main Content ── */}
       <main className="pt-16 lg:pl-64">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </main>
     </div>

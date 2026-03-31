@@ -1,53 +1,89 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useUser } from './useUser';
 import { Subscription } from '@/types';
+import { User as AuthUser } from '@supabase/supabase-js';
 
-export function useSubscription() {
-  const { user, loading: userLoading } = useUser();
+/**
+ * useSubscription — accepts optional user and loading state
+ * to avoid calling useUser() internally (which created duplicate
+ * Supabase clients and redundant auth calls).
+ *
+ * Usage:
+ *   const { user, loading: userLoading } = useUser();
+ *   const { subscription, isActive, loading: subLoading } = useSubscription(user, userLoading);
+ */
+export function useSubscription(user?: AuthUser | null, userLoading?: boolean) {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
+
+  const isUserLoading = userLoading ?? false;
 
   useEffect(() => {
-    const mounted = true;
-
-    const supabase = createClient();
+    mountedRef.current = true;
+    let loadingDone = false;
 
     async function fetchSubscription() {
       if (!user) {
-        if (mounted) {
+        if (mountedRef.current) {
           setSubscription(null);
           setLoading(false);
+          loadingDone = true;
         }
         return;
       }
 
-      const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
-      if (mounted) {
-        if (!error && data) {
-          setSubscription(data as Subscription);
-        } else {
-          setSubscription(null);
+        if (mountedRef.current) {
+          if (!error && data) {
+            setSubscription(data as Subscription);
+          } else {
+            setSubscription(null);
+          }
+          setLoading(false);
+          loadingDone = true;
         }
-        setLoading(false);
+      } catch {
+        if (mountedRef.current) {
+          setSubscription(null);
+          setLoading(false);
+          loadingDone = true;
+        }
       }
     }
 
-    if (!userLoading) {
+    if (!isUserLoading) {
       fetchSubscription();
     }
-  }, [user, userLoading]);
+
+    // Safety timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (mountedRef.current && !loadingDone) {
+        console.warn(
+          'useSubscription: Safety timeout reached – forcing loading state to false'
+        );
+        setLoading(false);
+      }
+    }, 5000);
+
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(timeout);
+    };
+  }, [user, isUserLoading]);
 
   return {
     subscription,
     isActive: subscription?.status === 'active',
-    loading: loading || userLoading,
+    loading: loading || isUserLoading,
   };
 }

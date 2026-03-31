@@ -4,23 +4,45 @@ import { Resend } from 'resend';
 // Email utility — shared Resend client and sender config
 // ──────────────────────────────────────────────────────────
 
-const resendApiKey = process.env.RESEND_API_KEY;
+// Lazy-init the Resend client so it doesn't crash at build time
+let _resend: Resend | null = null;
 
-if (!resendApiKey) {
-  console.warn(
-    'RESEND_API_KEY is not set. Email sending will fail at runtime.'
-  );
+export function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) {
+      console.warn(
+        'RESEND_API_KEY is not set. Email sending will fail at runtime.'
+      );
+    }
+    _resend = new Resend(key);
+  }
+  return _resend;
 }
 
-export const resend = new Resend(resendApiKey);
+// Keep backward-compatible export (uses lazy init)
+export const resend = new Proxy({} as Resend, {
+  get(_target, prop) {
+    return (getResend() as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});
 
 // Default sender address — uses Resend's testing domain unless configured
 export const EMAIL_FROM =
   process.env.EMAIL_FROM ?? 'Golf Charity Platform <onboarding@resend.dev>';
 
-// Site URL for email links
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+// Site URL for email links — supports Vercel deployment
+export function getSiteUrl(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
+}
+
+export const SITE_URL = getSiteUrl();
 
 // Format month string (e.g. '2026-03') to readable format (e.g. 'March 2026')
 export function formatDrawMonth(drawMonth: string): string {
