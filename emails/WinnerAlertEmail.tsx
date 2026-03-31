@@ -43,7 +43,7 @@ export default function WinnerAlertEmail({
         : '🥉 3-Number Match';
 
   const formatPrize = (pence: number) => {
-    return `£${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
+    return `₹${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
   };
 
   const previewText = `🏆 You've won ${formatPrize(prizeAmount)} in the ${drawMonth} draw!`;

@@ -83,7 +83,7 @@ export default function PrizeDrawSection() {
 
             <div className="relative z-10">
               <p className="text-4xl sm:text-5xl font-light tracking-tight">
-                <span className="text-gold-gradient">£5,000+</span>
+                <span className="text-gold-gradient">₹5,000+</span>
               </p>
               <p className="text-xs text-gray-500 mt-2 uppercase tracking-widest">
                 Jackpot Pool
@@ -111,7 +111,7 @@ export default function PrizeDrawSection() {
                 Match 4 of 5 numbers — split equally among all 4-match winners.
               </p>
               <p className="text-3xl font-light text-[#1A2E1A] tracking-tight">
-                £1,750
+                ₹1,750
               </p>
               <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">
                 Pool share
@@ -136,7 +136,7 @@ export default function PrizeDrawSection() {
                 Match 3 of 5 numbers — split equally among all 3-match winners.
               </p>
               <p className="text-3xl font-light text-[#1A2E1A] tracking-tight">
-                £1,250
+                ₹1,250
               </p>
               <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">
                 Pool share

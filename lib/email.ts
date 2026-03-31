@@ -51,9 +51,9 @@ export function formatDrawMonth(drawMonth: string): string {
   return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
-// Format pence to GBP string (e.g. 5000 → '£50.00')
+// Format pence to GBP string (e.g. 5000 → '₹50.00')
 export function formatPence(pence: number): string {
-  return `£${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
+  return `₹${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
 }
 
 // Format ISO date to readable date (e.g. '3 April 2026')

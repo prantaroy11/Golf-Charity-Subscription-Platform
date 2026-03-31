@@ -37,7 +37,7 @@ function formatMonth(drawMonth: string): string {
 }
 
 function formatPence(pence: number): string {
-  return `£${(pence / 100).toLocaleString('en-GB', {
+  return `₹${(pence / 100).toLocaleString('en-GB', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

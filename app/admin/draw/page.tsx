@@ -132,7 +132,7 @@ export default function AdminDrawPage() {
   };
 
   const formatPence = (pence: number) => {
-    return `£${(pence / 100).toFixed(2)}`;
+    return `₹${(pence / 100).toFixed(2)}`;
   };
 
   return (

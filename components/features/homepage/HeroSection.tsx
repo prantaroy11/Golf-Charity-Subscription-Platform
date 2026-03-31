@@ -32,7 +32,7 @@ const impactStats = [
   {
     icon: Heart,
     label: 'Total Raised',
-    value: '£127,450',
+    value: '₹127,450',
     color: 'text-[#D4AF37]',
   },
   {

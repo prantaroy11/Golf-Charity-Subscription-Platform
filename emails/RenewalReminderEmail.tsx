@@ -21,7 +21,7 @@ interface RenewalReminderEmailProps {
   fullName: string;
   plan: 'monthly' | 'yearly';
   renewalDate: string; // formatted date string, e.g. '3 April 2026'
-  amount: string; // formatted price, e.g. '£9.99'
+  amount: string; // formatted price, e.g. '₹9.99'
   siteUrl?: string;
 }
 
@@ -29,7 +29,7 @@ export default function RenewalReminderEmail({
   fullName = 'there',
   plan = 'monthly',
   renewalDate = '3 April 2026',
-  amount = '£9.99',
+  amount = '₹9.99',
   siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
 }: RenewalReminderEmailProps) {
   const previewText = `Your ${plan} subscription renews on ${renewalDate}`;

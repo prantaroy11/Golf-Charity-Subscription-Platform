@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      const amount = sub.plan === 'yearly' ? '£99.99' : '£9.99';
+      const amount = sub.plan === 'yearly' ? '₹99.99' : '₹9.99';
 
       try {
         await resend.emails.send({

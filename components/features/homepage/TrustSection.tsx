@@ -13,7 +13,7 @@ import Section from '@/components/layout/Section';
 const trustStats = [
   {
     icon: TrendingUp,
-    value: '£127,450',
+    value: '₹127,450',
     label: 'Total Donated',
   },
   {

@@ -67,7 +67,7 @@ describe('calculatePrizePool', () => {
   });
 
   it('handles a single subscriber correctly', () => {
-    const pool = calculatePrizePool(1, 2499); // £24.99 as pence
+    const pool = calculatePrizePool(1, 2499); // ₹24.99 as pence
     expect(pool.total).toBe(2499);
     expect(pool.jackpot).toBe(Math.floor(2499 * 0.4));
     expect(pool.fourMatch).toBe(Math.floor(2499 * 0.35));
@@ -75,7 +75,7 @@ describe('calculatePrizePool', () => {
   });
 
   it('handles large pool correctly', () => {
-    const pool = calculatePrizePool(10000, 2499); // 10,000 subs × £24.99
+    const pool = calculatePrizePool(10000, 2499); // 10,000 subs × ₹24.99
     expect(pool.total).toBe(24990000);
     expect(pool.jackpot).toBe(Math.floor(24990000 * 0.4));
     expect(pool.fourMatch).toBe(Math.floor(24990000 * 0.35));
@@ -123,27 +123,27 @@ describe('splitPrizeAmongWinners', () => {
 
 describe('formatPenceToPounds', () => {
   it('formats 0 pence', () => {
-    expect(formatPenceToPounds(0)).toBe('£0.00');
+    expect(formatPenceToPounds(0)).toBe('₹0.00');
   });
 
-  it('formats 100 pence as £1.00', () => {
-    expect(formatPenceToPounds(100)).toBe('£1.00');
+  it('formats 100 pence as ₹1.00', () => {
+    expect(formatPenceToPounds(100)).toBe('₹1.00');
   });
 
-  it('formats 125000 pence as £1,250.00', () => {
-    expect(formatPenceToPounds(125000)).toBe('£1,250.00');
+  it('formats 125000 pence as ₹1,250.00', () => {
+    expect(formatPenceToPounds(125000)).toBe('₹1,250.00');
   });
 
   it('formats small amounts correctly', () => {
-    expect(formatPenceToPounds(50)).toBe('£0.50');
+    expect(formatPenceToPounds(50)).toBe('₹0.50');
   });
 
   it('formats single pence', () => {
-    expect(formatPenceToPounds(1)).toBe('£0.01');
+    expect(formatPenceToPounds(1)).toBe('₹0.01');
   });
 
   it('formats very large amounts with commas', () => {
-    expect(formatPenceToPounds(1000000)).toBe('£10,000.00');
+    expect(formatPenceToPounds(1000000)).toBe('₹10,000.00');
   });
 });
 

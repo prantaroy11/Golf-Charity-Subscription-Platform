@@ -7,7 +7,6 @@ import { Charity } from '@/types';
 import LightCard from '@/components/ui/LightCard';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { Input } from '@/components/ui/input';
-import Image from 'next/image';
 
 export interface EnrichedCharity extends Charity {
   funded_this_month: number;
@@ -69,11 +68,9 @@ export function CharityDirectory({ charities }: CharityDirectoryProps) {
                 <LightCard className="h-full flex flex-col bg-[#D4AF37]/10 border-[#D4AF37]/20 hover:shadow-lg transition-all group">
                   <div className="p-8 flex flex-col items-center text-center flex-grow">
                     {charity.logo_url ? (
-                      <Image
+                      <img
                         src={charity.logo_url}
                         alt={charity.name}
-                        width={96}
-                        height={96}
                         className="w-24 h-24 object-contain mb-6 rounded-full bg-white p-2 shadow-sm group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
@@ -116,11 +113,9 @@ export function CharityDirectory({ charities }: CharityDirectoryProps) {
                 <LightCard className="h-full flex flex-col hover:shadow-lg transition-all group border-gray-100">
                   <div className="p-8 flex flex-col items-center text-center flex-grow">
                     {charity.logo_url ? (
-                      <Image
+                      <img
                         src={charity.logo_url}
                         alt={charity.name}
-                        width={80}
-                        height={80}
                         className="w-20 h-20 object-contain mb-5 rounded-full bg-gray-50 p-2 group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (

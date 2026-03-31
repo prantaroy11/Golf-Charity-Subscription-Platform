@@ -51,7 +51,7 @@ export default function DrawResultsEmail({
     : `${drawMonth} draw results are in — see how you did!`;
 
   const formatPrize = (pence: number) => {
-    return `£${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
+    return `₹${(pence / 100).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
   };
 
   return (

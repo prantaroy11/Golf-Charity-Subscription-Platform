@@ -20,7 +20,7 @@ import * as React from 'react';
 interface PaymentConfirmationEmailProps {
   fullName: string;
   plan: 'monthly' | 'yearly';
-  amount: string; // formatted price, e.g. '£9.99'
+  amount: string; // formatted price, e.g. '₹9.99'
   nextRenewalDate: string; // formatted date, e.g. '30 April 2026'
   charityName?: string; // name of chosen charity if any
   siteUrl?: string;
@@ -29,7 +29,7 @@ interface PaymentConfirmationEmailProps {
 export default function PaymentConfirmationEmail({
   fullName = 'there',
   plan = 'monthly',
-  amount = '£9.99',
+  amount = '₹9.99',
   nextRenewalDate = '30 April 2026',
   charityName,
   siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',

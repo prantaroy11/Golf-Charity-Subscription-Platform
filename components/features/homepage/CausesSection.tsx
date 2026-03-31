@@ -18,21 +18,21 @@ const causes = [
     name: 'Junior Golf Foundation',
     description:
       'Providing free coaching and equipment to young players from underserved communities, making golf accessible to everyone.',
-    funded: '£4,230',
+    funded: '₹4,230',
   },
   {
     icon: Leaf,
     name: 'Greens for Good',
     description:
       'Restoring natural habitats on and around golf courses, protecting biodiversity and reducing environmental impact.',
-    funded: '£3,815',
+    funded: '₹3,815',
   },
   {
     icon: Globe2,
     name: 'Golf Without Borders',
     description:
       'Building golf programmes in developing countries to promote wellbeing, education, and community connection through sport.',
-    funded: '£2,970',
+    funded: '₹2,970',
   },
 ];
 

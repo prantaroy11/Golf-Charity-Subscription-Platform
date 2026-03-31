@@ -17,8 +17,8 @@ import {
 // Admin-only endpoint to run a monthly draw
 // ──────────────────────────────────────────────────────────
 
-// Fixed monthly contribution per subscriber in pence (e.g. £5.00 = 500p)
-const MONTHLY_CONTRIBUTION_PENCE = 500;
+// Fixed monthly contribution per subscriber in pence (e.g. ₹10.00 = 1000p)
+const MONTHLY_CONTRIBUTION_PENCE = 1000;
 
 interface DrawRequestBody {
   drawMonth: string; // e.g. '2026-03'

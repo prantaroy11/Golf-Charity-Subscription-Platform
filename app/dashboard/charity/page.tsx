@@ -315,7 +315,7 @@ export default function CharityPage() {
               Total Contributed
             </p>
             <p className="text-3xl font-light text-[#1A2E1A] tabular-nums">
-              £{(totalContributed / 100).toFixed(2)}
+              ₹{(totalContributed / 100).toFixed(2)}
             </p>
             <p className="text-xs text-gray-400 mt-1">
               to {selectedCharity?.name ?? 'your charity'}
