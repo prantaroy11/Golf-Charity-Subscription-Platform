@@ -10,18 +10,22 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      // Fire-and-forget: send welcome email after successful confirmation
+      // Send welcome email after successful confirmation
       if (data?.user) {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? origin;
-        fetch(`${siteUrl}/api/email/welcome`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: data.user.id,
-            email: data.user.email,
-            fullName: data.user.user_metadata?.full_name,
-          }),
-        }).catch((err) => console.error('Welcome email trigger failed:', err));
+        try {
+          await fetch(`${siteUrl}/api/email/welcome`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: data.user.id,
+              email: data.user.email,
+              fullName: data.user.user_metadata?.full_name,
+            }),
+          });
+        } catch (err) {
+          console.error('Welcome email trigger failed:', err);
+        }
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

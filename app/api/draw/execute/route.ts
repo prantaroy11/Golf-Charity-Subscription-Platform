@@ -334,18 +334,22 @@ export async function POST(req: NextRequest) {
           ? `https://${process.env.VERCEL_URL}`
           : 'http://localhost:3000');
 
-      // Fire-and-forget: send draw results to all participants
-      fetch(`${siteUrl}/api/email/draw-results`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ drawMonth }),
-      }).catch((err) =>
-        console.error('Draw results email trigger failed:', err)
-      );
+      // Send draw results email to all participants
+      try {
+        const drawEmailRes = await fetch(`${siteUrl}/api/email/draw-results`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ drawMonth }),
+        });
+        if (!drawEmailRes.ok) {
+          console.error('Draw results email failed:', drawEmailRes.status);
+        }
+      } catch (err) {
+        console.error('Draw results email trigger failed:', err);
+      }
 
-      // Fire-and-forget: send winner alerts to each winner
+      // Send winner alerts to each winner
       if (winners.length > 0) {
-        // We need the winner IDs from the DB — fetch them
         const { data: savedWinners } = await supabaseAdmin
           .from('winners')
           .select('id')
@@ -353,13 +357,24 @@ export async function POST(req: NextRequest) {
 
         if (savedWinners) {
           for (const sw of savedWinners) {
-            fetch(`${siteUrl}/api/email/winner-alert`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ winnerId: sw.id }),
-            }).catch((err) =>
-              console.error('Winner alert email trigger failed:', err)
-            );
+            try {
+              const winnerEmailRes = await fetch(
+                `${siteUrl}/api/email/winner-alert`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ winnerId: sw.id }),
+                }
+              );
+              if (!winnerEmailRes.ok) {
+                console.error(
+                  'Winner alert email failed:',
+                  winnerEmailRes.status
+                );
+              }
+            } catch (err) {
+              console.error('Winner alert email trigger failed:', err);
+            }
           }
         }
       }

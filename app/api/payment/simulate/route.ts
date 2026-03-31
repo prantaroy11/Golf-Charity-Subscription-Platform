@@ -117,19 +117,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Fire-and-forget: send payment confirmation email
+    // Send payment confirmation email
+    // Must be awaited — unawaited fetches get killed when the route returns
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL ??
       (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
         : 'http://localhost:3000');
-    fetch(`${siteUrl}/api/email/payment-confirmation`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, plan }),
-    }).catch((err) =>
-      console.error('Payment confirmation email trigger failed:', err)
-    );
+    try {
+      const emailRes = await fetch(
+        `${siteUrl}/api/email/payment-confirmation`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, plan }),
+        }
+      );
+      if (!emailRes.ok) {
+        const errBody = await emailRes.text();
+        console.error(
+          'Payment confirmation email failed:',
+          emailRes.status,
+          errBody
+        );
+      }
+    } catch (err) {
+      console.error('Payment confirmation email trigger failed:', err);
+    }
 
     return NextResponse.json(mockResponse);
   } catch (error) {
