@@ -16,6 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
@@ -188,14 +189,16 @@ export default function Navbar({
                     </span>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8}>
-                    <DropdownMenuLabel>
-                      <span className="block text-sm font-medium">
-                        {user.full_name || 'User'}
-                      </span>
-                      <span className="block text-xs text-muted-foreground truncate">
-                        {user.email}
-                      </span>
-                    </DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>
+                        <span className="block text-sm font-medium">
+                          {user.full_name || 'User'}
+                        </span>
+                        <span className="block text-xs text-muted-foreground truncate">
+                          {user.email}
+                        </span>
+                      </DropdownMenuLabel>
+                    </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem render={<Link href="/dashboard" />}>
                       <LayoutDashboard className="w-4 h-4 mr-2 text-[#D4AF37]" />

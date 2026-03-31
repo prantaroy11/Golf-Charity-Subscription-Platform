@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// ──────────────────────────────────────────────────────────
+// Proxy — Session refresh on every navigation request
+// Next.js 16 uses "proxy" instead of "middleware"
+// ──────────────────────────────────────────────────────────
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -30,6 +35,7 @@ export async function proxy(request: NextRequest) {
   );
 
   // Refresh the session — IMPORTANT: do not remove this
+  // getUser() validates the JWT and refreshes the token if needed
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -68,6 +74,22 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // ──────────────────────────────────────────────────────────
+  // Auth pages: /login, /signup
+  // Redirect authenticated users to /dashboard
+  // ──────────────────────────────────────────────────────────
+  const authPaths = ['/login', '/signup'];
+  const isAuthRoute = authPaths.some((path) => pathname === path);
+
+  if (user && isAuthRoute) {
+    const redirect =
+      request.nextUrl.searchParams.get('redirect') || '/dashboard';
+    const url = request.nextUrl.clone();
+    url.pathname = redirect;
+    url.searchParams.delete('redirect');
+    return NextResponse.redirect(url);
+  }
+
   return supabaseResponse;
 }
 
@@ -79,7 +101,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder files (images, etc.)
+     * - api routes (handled by their own auth)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

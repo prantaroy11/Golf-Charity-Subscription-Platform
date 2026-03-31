@@ -5,12 +5,14 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Heart, Trophy, Building2 } from 'lucide-react';
 import LightCard from '@/components/ui/LightCard';
 import { createClient } from '@/lib/supabase/client';
-import { useUser } from '@/hooks/useUser';
 
 // ──────────────────────────────────────────────────────────
 // LifetimeContribution — Step 10.3
 // Shows total lifetime contributions with an animated
 // impact distribution bar (charity / prize pool / platform).
+//
+// Accepts userId as a prop instead of calling useUser() again
+// to avoid creating redundant Supabase client instances.
 // ──────────────────────────────────────────────────────────
 
 interface ContributionData {
@@ -20,8 +22,13 @@ interface ContributionData {
   platformAmount: number;
 }
 
-export default function LifetimeContribution() {
-  const { user } = useUser();
+interface LifetimeContributionProps {
+  userId?: string;
+}
+
+export default function LifetimeContribution({
+  userId: propUserId,
+}: LifetimeContributionProps) {
   const [data, setData] = useState<ContributionData>({
     totalContributed: 0,
     charityAmount: 0,
@@ -31,8 +38,23 @@ export default function LifetimeContribution() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchContributions() {
-      if (!user) return;
+      // Resolve the userId: use prop if available, otherwise fetch from auth
+      let userId = propUserId ?? null;
+      if (!userId) {
+        const supabase = createClient();
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
+        userId = authUser?.id ?? null;
+      }
+
+      if (!userId) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
 
       const supabase = createClient();
 
@@ -40,10 +62,14 @@ export default function LifetimeContribution() {
       const { data: contributions } = await supabase
         .from('charity_contributions')
         .select('amount_pence')
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       const totalCharity =
-        contributions?.reduce((sum, c) => sum + (c.amount_pence || 0), 0) ?? 0;
+        contributions?.reduce(
+          (sum: number, c: { amount_pence: number }) =>
+            sum + (c.amount_pence || 0),
+          0
+        ) ?? 0;
 
       // Simulate total contribution based on subscription payments
       // In a real app, this would be tracked per payment
@@ -56,17 +82,23 @@ export default function LifetimeContribution() {
       const prizePool = Math.floor(total * 0.6);
       const platform = total - charity - prizePool;
 
-      setData({
-        totalContributed: total,
-        charityAmount: charity,
-        prizePoolAmount: prizePool,
-        platformAmount: platform,
-      });
-      setLoading(false);
+      if (!cancelled) {
+        setData({
+          totalContributed: total,
+          charityAmount: charity,
+          prizePoolAmount: prizePool,
+          platformAmount: platform,
+        });
+        setLoading(false);
+      }
     }
 
     fetchContributions();
-  }, [user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [propUserId]);
 
   const formatPence = (pence: number) => {
     return `£${(pence / 100).toFixed(2)}`;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart,
@@ -77,8 +78,11 @@ export default function CharityPage() {
           .eq('charity_id', profile.charity_id);
 
         const total =
-          contributions?.reduce((sum, c) => sum + (c.amount_pence || 0), 0) ??
-          0;
+          contributions?.reduce(
+            (sum: number, c: { amount_pence: number }) =>
+              sum + (c.amount_pence || 0),
+            0
+          ) ?? 0;
         setTotalContributed(total);
       }
 
@@ -193,10 +197,13 @@ export default function CharityPage() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   {selectedCharity.logo_url ? (
-                    <img
+                    <Image
                       src={selectedCharity.logo_url}
                       alt={selectedCharity.name}
+                      width={56}
+                      height={56}
                       className="w-14 h-14 rounded-xl object-cover border border-gray-100"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-14 h-14 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center">
@@ -387,10 +394,13 @@ export default function CharityPage() {
                       )}
                     >
                       {charity.logo_url ? (
-                        <img
+                        <Image
                           src={charity.logo_url}
                           alt={charity.name}
+                          width={40}
+                          height={40}
                           className="w-10 h-10 rounded-lg object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">

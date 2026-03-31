@@ -48,8 +48,10 @@ function LoginForm() {
         setServerError('Invalid email or password');
       } else {
         const redirect = searchParams.get('redirect') || '/dashboard';
-        router.push(redirect);
+        // Refresh first so middleware picks up the new session cookies,
+        // then navigate to the target page
         router.refresh();
+        router.push(redirect);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

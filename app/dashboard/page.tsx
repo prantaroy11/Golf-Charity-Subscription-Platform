@@ -9,18 +9,15 @@ import {
   Ticket,
   ArrowRight,
   Heart,
-  CheckCircle2,
-  TrendingUp,
   Leaf,
 } from 'lucide-react';
 import LightCard from '@/components/ui/LightCard';
 import StatusBadge from '@/components/ui/StatusBadge';
-import GoldButton from '@/components/ui/GoldButton';
+
 import LifetimeContribution from '@/components/features/dashboard/LifetimeContribution';
 import ScoreEntry from '@/components/features/scores/ScoreEntry';
 import { useUser } from '@/hooks/useUser';
 import { useSubscription } from '@/hooks/useSubscription';
-import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
 // ──────────────────────────────────────────────────────────
@@ -56,8 +53,8 @@ function getMonthName(monthStr: string): string {
 }
 
 export default function DashboardPage() {
-  const { profile } = useUser();
-  const { subscription, isActive } = useSubscription();
+  const { user, profile, loading: userLoading } = useUser();
+  const { subscription } = useSubscription(user, userLoading);
   const [drawsEnteredCount, setDrawsEnteredCount] = useState(0);
   const [nextDrawMonth, setNextDrawMonth] = useState('');
   const [currentDraw, setCurrentDraw] = useState<{
@@ -68,23 +65,15 @@ export default function DashboardPage() {
   const [impactFeed, setImpactFeed] = useState<
     { type: string; text: string; date: string }[]
   >([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there';
 
   useEffect(() => {
     async function fetchDashboardData() {
-      const supabase = createClient();
-      const userId = profile?.id;
-      if (!userId) return;
+      if (!profile?.id) return;
 
-      // Draws entered count
-      const { data: entries } = await supabase
-        .from('draw_entries')
-        .select('id')
-        .eq('user_id', userId);
-      setDrawsEnteredCount(entries?.length ?? 0);
-
-      // Next draw month
+      // Calculate next draw month locally (no API needed)
       const now = new Date();
       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       const nextMonthStr = `${nextMonth.getFullYear()}-${String(
@@ -92,54 +81,20 @@ export default function DashboardPage() {
       ).padStart(2, '0')}`;
       setNextDrawMonth(nextMonthStr);
 
-      // Current/latest draw
-      const { data: draws } = await supabase
-        .from('draws')
-        .select('*')
-        .order('draw_month', { ascending: false })
-        .limit(1);
-      if (draws && draws.length > 0) {
-        setCurrentDraw(draws[0]);
+      try {
+        // Fetch all dashboard data in a single batched request
+        const res = await fetch('/api/dashboard');
+        if (res.ok) {
+          const data = await res.json();
+          setDrawsEnteredCount(data.drawsEnteredCount ?? 0);
+          setCurrentDraw(data.currentDraw ?? null);
+          setImpactFeed(data.impactFeed ?? []);
+        }
+      } catch (err) {
+        console.error('Dashboard data fetch failed:', err);
+      } finally {
+        setDashboardLoading(false);
       }
-
-      // Build impact feed from contributions + winnings
-      const feed: { type: string; text: string; date: string }[] = [];
-
-      const { data: contributions } = await supabase
-        .from('charity_contributions')
-        .select('amount_pence, period_month, created_at')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      contributions?.forEach((c) => {
-        feed.push({
-          type: 'contribution',
-          text: `£${(c.amount_pence / 100).toFixed(2)} donated (${c.period_month})`,
-          date: c.created_at,
-        });
-      });
-
-      const { data: winnings } = await supabase
-        .from('winners')
-        .select('prize_amount, match_tier, created_at')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      winnings?.forEach((w) => {
-        feed.push({
-          type: 'win',
-          text: `${w.match_tier}-match win — £${(w.prize_amount / 100).toFixed(2)}`,
-          date: w.created_at,
-        });
-      });
-
-      // Sort by date descending, take 5
-      feed.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setImpactFeed(feed.slice(0, 5));
     }
 
     fetchDashboardData();
@@ -243,7 +198,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-2xl font-light text-[#1A2E1A] tabular-nums">
-                      {drawsEnteredCount}
+                      {dashboardLoading ? '—' : drawsEnteredCount}
                     </p>
                     <p className="text-xs text-gray-400">Draws Entered</p>
                   </div>

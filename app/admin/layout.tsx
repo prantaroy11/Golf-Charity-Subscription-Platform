@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import {
   Users,
   Ticket,
@@ -279,7 +280,7 @@ export default function AdminLayout({
       {/* ── Main Content ── */}
       <main className="pt-14 lg:pl-60">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-8">
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </main>
     </div>

@@ -329,7 +329,10 @@ export async function POST(req: NextRequest) {
     // ── 14. Trigger emails on publish ──
     if (mode === 'publish') {
       const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+        process.env.NEXT_PUBLIC_SITE_URL ??
+        (process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000');
 
       // Fire-and-forget: send draw results to all participants
       fetch(`${siteUrl}/api/email/draw-results`, {

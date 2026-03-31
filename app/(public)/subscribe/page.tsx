@@ -11,7 +11,7 @@ import Footer from '@/components/layout/Footer';
 export default function SubscribePage() {
   const router = useRouter();
   const { user, loading: userLoading } = useUser();
-  const { isActive, loading: subLoading } = useSubscription();
+  const { isActive, loading: subLoading } = useSubscription(user, userLoading);
 
   useEffect(() => {
     if (userLoading || subLoading) return;
