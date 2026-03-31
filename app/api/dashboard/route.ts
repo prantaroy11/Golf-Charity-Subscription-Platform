@@ -59,7 +59,7 @@ export async function GET() {
     (c: { amount_pence: number; period_month: string; created_at: string }) => {
       feed.push({
         type: 'contribution',
-        text: `£${(c.amount_pence / 100).toFixed(2)} donated (${c.period_month})`,
+        text: `₹${(c.amount_pence / 100).toFixed(2)} donated (${c.period_month})`,
         date: c.created_at,
       });
     }
@@ -69,7 +69,7 @@ export async function GET() {
     (w: { prize_amount: number; match_tier: string; created_at: string }) => {
       feed.push({
         type: 'win',
-        text: `${w.match_tier}-match win — £${(w.prize_amount / 100).toFixed(2)}`,
+        text: `${w.match_tier}-match win — ₹${(w.prize_amount / 100).toFixed(2)}`,
         date: w.created_at,
       });
     }

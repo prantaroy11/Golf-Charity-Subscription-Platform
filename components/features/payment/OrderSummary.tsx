@@ -54,7 +54,7 @@ export default function OrderSummary({
           {plan === 'monthly' ? 'Monthly' : 'Yearly'} Plan
         </span>
         <span className="font-medium text-[#1A2E1A]">
-          £{price.toFixed(2)}/{periodLabel}
+          ₹{price.toFixed(2)}/{periodLabel}
         </span>
       </div>
 
@@ -65,7 +65,7 @@ export default function OrderSummary({
           10% to {charityName}
         </span>
         <span className="text-[#D4AF37] font-medium">
-          £{charityAmount}/{periodLabel}
+          ₹{charityAmount}/{periodLabel}
         </span>
       </div>
 
@@ -76,7 +76,7 @@ export default function OrderSummary({
       <div className="flex items-center justify-between">
         <span className="font-semibold text-[#1A2E1A]">Total</span>
         <span className="text-xl font-serif font-medium text-[#1A2E1A]">
-          £{price.toFixed(2)}
+          ₹{price.toFixed(2)}
         </span>
       </div>
 

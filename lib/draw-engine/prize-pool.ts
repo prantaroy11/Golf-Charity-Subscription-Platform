@@ -48,10 +48,10 @@ export function splitPrizeAmongWinners(
 
 /**
  * Format pence as a GBP currency string.
- * e.g. 125000 → "£1,250.00"
+ * e.g. 125000 → "₹1,250.00"
  */
 export function formatPenceToPounds(pence: number): string {
-  return `£${(pence / 100).toLocaleString('en-GB', {
+  return `₹${(pence / 100).toLocaleString('en-GB', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

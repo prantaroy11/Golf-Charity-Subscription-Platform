@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/client';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import GoldButton from '@/components/ui/GoldButton';
@@ -32,7 +31,6 @@ export default function SignupPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
 
   const {
     register,
@@ -47,18 +45,22 @@ export default function SignupPage() {
     setIsLoading(true);
     setServerError(null);
     try {
-      const { error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.fullName,
-          },
-        },
+      // Use server-side API to create user with auto-confirmation
+      // This bypasses Supabase's email rate limits on the free tier
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          fullName: data.fullName,
+        }),
       });
 
-      if (error) {
-        setServerError(error.message);
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.error || 'Signup failed. Please try again.');
       } else {
         setIsSuccess(true);
       }
@@ -80,17 +82,17 @@ export default function SignupPage() {
           <CheckCircle2 className="w-16 h-16 text-green-500" />
         </div>
         <h2 className="text-2xl font-serif text-forest font-bold">
-          Check your email
+          Account Created!
         </h2>
         <p className="text-gray-600">
-          We&apos;ve sent a confirmation link to your email address. Please
-          confirm your account to continue.
+          Your account has been created and confirmed. You can now log in and
+          start your subscription.
         </p>
         <Link
           href="/login"
           className="inline-block mt-4 text-gold-main hover:underline"
         >
-          Return to Login
+          Go to Login →
         </Link>
       </LightCard>
     );

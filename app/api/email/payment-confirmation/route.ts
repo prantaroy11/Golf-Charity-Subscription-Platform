@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate price
-    const amount = plan === 'yearly' ? '£99.99' : '£9.99';
+    const amount = plan === 'yearly' ? '₹99.99' : '₹9.99';
     const nextRenewalDate = sub?.current_period_end
       ? formatDate(sub.current_period_end)
       : 'Next month';

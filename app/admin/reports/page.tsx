@@ -58,7 +58,7 @@ export default function AdminReportsPage() {
     }
   };
 
-  const formatPence = (pence: number) => `£${(pence / 100).toFixed(2)}`;
+  const formatPence = (pence: number) => `₹${(pence / 100).toFixed(2)}`;
 
   const exportCSV = () => {
     if (!data?.recentDrawEntries) return;

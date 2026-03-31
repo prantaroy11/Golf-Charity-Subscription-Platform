@@ -79,7 +79,7 @@ export default function PlanSelector({
               {/* Price */}
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-serif font-light text-[#1A2E1A]">
-                  £{MONTHLY_PRICE.toFixed(2)}
+                  ₹{MONTHLY_PRICE.toFixed(2)}
                 </span>
                 <span className="text-gray-400 text-sm">/month</span>
               </div>
@@ -145,12 +145,12 @@ export default function PlanSelector({
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-serif font-light text-[#1A2E1A]">
-                    £{YEARLY_PRICE.toFixed(2)}
+                    ₹{YEARLY_PRICE.toFixed(2)}
                   </span>
                   <span className="text-gray-400 text-sm">/year</span>
                 </div>
                 <p className="text-sm text-[#D4AF37] font-medium mt-1">
-                  £{YEARLY_MONTHLY_EQUIVALENT.toFixed(2)}/month — Save £
+                  ₹{YEARLY_MONTHLY_EQUIVALENT.toFixed(2)}/month — Save ₹
                   {(MONTHLY_PRICE * 12 - YEARLY_PRICE).toFixed(2)}/year
                 </p>
               </div>

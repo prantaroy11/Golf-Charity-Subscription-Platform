@@ -77,7 +77,7 @@ export default function LifetimeContribution({
       const estimatedTotal = totalCharity > 0 ? totalCharity * 10 : 0;
 
       // Use illustrative numbers if no real data
-      const total = estimatedTotal > 0 ? estimatedTotal : 24500; // £245.00 illustrative
+      const total = estimatedTotal > 0 ? estimatedTotal : 24500; // ₹245.00 illustrative
       const charity = totalCharity > 0 ? totalCharity : Math.floor(total * 0.1);
       const prizePool = Math.floor(total * 0.6);
       const platform = total - charity - prizePool;
@@ -101,7 +101,7 @@ export default function LifetimeContribution({
   }, [propUserId]);
 
   const formatPence = (pence: number) => {
-    return `£${(pence / 100).toFixed(2)}`;
+    return `₹${(pence / 100).toFixed(2)}`;
   };
 
   const totalNonzero = data.totalContributed || 1;
