@@ -350,3 +350,6 @@ npm run test:e2e:ui
 ## License
 
 This project is proprietary. All rights reserved.
+
+## Live Link
+(https://golf-charity-subscription-platform-theta-ten.vercel.app/)
